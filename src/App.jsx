@@ -3,8 +3,11 @@ import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
 import Events from './pages/Events';
+import Cameras from './pages/Cameras';
+import Analytics from './pages/Analytics';
+import Settings from './pages/Settings';
 import ErrorBoundary from './components/ErrorBoundary';
-import { LayoutDashboard, AlertTriangle, FileText, BarChart3, Settings, Camera } from 'lucide-react';
+import { LayoutDashboard, AlertTriangle, FileText, BarChart3, Settings as SettingsIcon, Camera } from 'lucide-react';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -15,7 +18,7 @@ function App() {
     { id: 'alerts', label: 'Alerts', icon: AlertTriangle },
     { id: 'events', label: 'Events', icon: FileText },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
   return (
@@ -47,11 +50,11 @@ function App() {
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
         {currentPage === 'dashboard' && <Dashboard />}
-        {currentPage === 'cameras' && <div className="p-6"><h1 className="text-2xl font-bold">Cameras Page</h1></div>}
+        {currentPage === 'cameras' && <Cameras />}
         {currentPage === 'alerts' && <Alerts />}
         {currentPage === 'events' && <Events />}
-        {currentPage === 'analytics' && <div className="p-6"><h1 className="text-2xl font-bold">Analytics Page</h1></div>}
-        {currentPage === 'settings' && <div className="p-6"><h1 className="text-2xl font-bold">Settings Page</h1></div>}
+        {currentPage === 'analytics' && <Analytics />}
+        {currentPage === 'settings' && <Settings />}
       </div>
     </div></ErrorBoundary>
   );
