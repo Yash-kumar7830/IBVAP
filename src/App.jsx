@@ -1,6 +1,9 @@
 // src/App.jsx
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
+import Alerts from './pages/Alerts';
+import Events from './pages/Events';
+import ErrorBoundary from './components/ErrorBoundary';
 import { LayoutDashboard, AlertTriangle, FileText, BarChart3, Settings, Camera } from 'lucide-react';
 
 function App() {
@@ -16,7 +19,7 @@ function App() {
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <ErrorBoundary><div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-white border-r">
         <div className="p-6 border-b">
@@ -45,12 +48,12 @@ function App() {
       <div className="flex-1 overflow-auto">
         {currentPage === 'dashboard' && <Dashboard />}
         {currentPage === 'cameras' && <div className="p-6"><h1 className="text-2xl font-bold">Cameras Page</h1></div>}
-        {currentPage === 'alerts' && <div className="p-6"><h1 className="text-2xl font-bold">Alerts Page</h1></div>}
-        {currentPage === 'events' && <div className="p-6"><h1 className="text-2xl font-bold">Events Page</h1></div>}
+        {currentPage === 'alerts' && <Alerts />}
+        {currentPage === 'events' && <Events />}
         {currentPage === 'analytics' && <div className="p-6"><h1 className="text-2xl font-bold">Analytics Page</h1></div>}
         {currentPage === 'settings' && <div className="p-6"><h1 className="text-2xl font-bold">Settings Page</h1></div>}
       </div>
-    </div>
+    </div></ErrorBoundary>
   );
 }
 

@@ -1,11 +1,16 @@
 // TODO: Implement the polygon zone drawing editor.
 // src/components/ZoneEditor.jsx
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { X, Save, RotateCcw } from 'lucide-react';
+import { getZones, saveZone } from '../services/api';
 
-export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
+export default function ZoneEditor({ isOpen, onClose, onSave, cameraId, zoneName = '' }) {
   const canvasRef = useRef(null);
   const [points, setPoints] = useState([]);
+  const [name, setName] = useState(zoneName);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   const getCanvasCoordinates = (e) => {
     const canvas = canvasRef.current;
@@ -20,14 +25,43 @@ export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
     setPoints([...points, { x, y }]);
   };
 
-  const handleSave = () => {
+  useEffect(() => {
+    if (!isOpen || !cameraId) return;
+    let active = true;
+    const timer = setTimeout(() => {
+      setLoading(true);
+      setError(null);
+    }, 0);
+    getZones(cameraId)
+      .then((zones) => {
+        if (!active) return;
+        const firstZone = (zones || [])[0];
+        setPoints(firstZone?.points || []);
+        setName(firstZone?.name || zoneName);
+      })
+      .catch((loadError) => active && setError(loadError.message))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; clearTimeout(timer); };
+  }, [cameraId, isOpen, zoneName]);
+
+  const handleSave = async () => {
     if (points.length >= 3) {
-      onSave({
-        name: zoneName || 'Restricted Zone',
+      const zone = {
+        name: name.trim() || 'Restricted Zone',
         points,
         type: 'restricted'
-      });
-      onClose();
+      };
+      setSaving(true);
+      setError(null);
+      try {
+        const savedZone = cameraId ? await saveZone(cameraId, zone) : zone;
+        onSave?.(savedZone || zone);
+        onClose();
+      } catch (saveError) {
+        setError(saveError.message);
+      } finally {
+        setSaving(false);
+      }
     }
   };
 
@@ -35,7 +69,7 @@ export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
     setPoints([]);
   };
 
-  const drawPolygon = () => {
+  const drawPolygon = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     
@@ -83,13 +117,13 @@ export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
         ctx.fillText(index + 1, point.x * canvas.width + 8, point.y * canvas.height - 8);
       });
     }
-  };
+  }, [points]);
 
   useEffect(() => {
     if (isOpen) {
       drawPolygon();
     }
-  }, [points, isOpen]);
+  }, [drawPolygon, isOpen]);
 
   if (!isOpen) return null;
 
@@ -108,9 +142,13 @@ export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
             type="text"
             placeholder="Zone Name (e.g., Restricted Area)"
             className="w-full border rounded px-3 py-2"
-            defaultValue={zoneName}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
           />
         </div>
+
+        {loading && <p className="mb-2 text-sm text-gray-500">Loading existing zones...</p>}
+        {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
 
         <canvas
           ref={canvasRef}
@@ -130,11 +168,11 @@ export default function ZoneEditor({ isOpen, onClose, onSave, zoneName }) {
           </button>
           <button
             onClick={handleSave}
-            disabled={points.length < 3}
+            disabled={points.length < 3 || saving}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            Save Zone ({points.length} points)
+            {saving ? 'Saving...' : `Save Zone (${points.length} points)`}
           </button>
         </div>
 

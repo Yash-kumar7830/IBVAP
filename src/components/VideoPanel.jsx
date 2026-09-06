@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import VideoPlayer from './VideoPlayer';
 
-export default function VideoPanel({ camera, showOriginal = true, showAI = true }) {
+export default function VideoPanel({ camera, showOriginal = true, showAI = true, detections = [] }) {
   const [viewMode, setViewMode] = useState('both');
 
   const getViewClass = () => {
@@ -62,7 +62,7 @@ export default function VideoPanel({ camera, showOriginal = true, showAI = true 
             <div className="text-sm font-semibold mb-2 text-gray-700">
               AI Annotated Feed
             </div>
-            <VideoPlayer streamUrl={camera.aiStream || camera.originalStream} />
+            <VideoPlayer streamUrl={camera.aiStream || camera.originalStream} detections={detections} />
             <div className="mt-2 flex gap-4 text-xs">
               <span className="flex items-center gap-1">
                 <span className="w-3 h-3 bg-red-500 rounded"></span>
