@@ -1,17 +1,20 @@
-// TODO: Implement the HLS video player with AI overlay support.
 // src/components/VideoPlayer.jsx
 import { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
+import { LoaderCircle, RotateCw, WifiOff } from 'lucide-react';
 
 export default function VideoPlayer({ streamUrl, onVideoReady, detections = [] }) {
   const videoRef = useRef(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !streamUrl) return undefined;
 
     setError(null);
+    setLoading(true);
 
     let hls;
 
@@ -29,12 +32,14 @@ export default function VideoPlayer({ streamUrl, onVideoReady, detections = [] }
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.play().catch(() => {});
+        setLoading(false);
         onVideoReady?.();
       });
 
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
           setError('Stream unavailable');
+          setLoading(false);
           hls.destroy();
         }
       });
@@ -42,6 +47,7 @@ export default function VideoPlayer({ streamUrl, onVideoReady, detections = [] }
       video.src = streamUrl;
       const handleMetadata = () => {
         video.play().catch(() => {});
+        setLoading(false);
         onVideoReady?.();
       };
       video.addEventListener('loadedmetadata', handleMetadata);
@@ -51,7 +57,7 @@ export default function VideoPlayer({ streamUrl, onVideoReady, detections = [] }
     return () => {
       if (hls) hls.destroy();
     };
-  }, [streamUrl, onVideoReady]);
+  }, [streamUrl, onVideoReady, attempt]);
 
   return (
     <div className="relative bg-black rounded-lg overflow-hidden aspect-video">
@@ -78,9 +84,9 @@ export default function VideoPlayer({ streamUrl, onVideoReady, detections = [] }
           </div>
         );
       })}
+      {loading && !error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-slate-950/70 text-xs text-slate-300"><LoaderCircle className="h-6 w-6 animate-spin text-cyan-300" />Connecting to stream</div>}
       {error && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
-          {error}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-slate-950/85 p-4 text-center text-white"><WifiOff className="h-7 w-7 text-amber-300" /><span className="text-sm">{error}</span><button type="button" onClick={() => setAttempt((value) => value + 1)} className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20"><RotateCw className="h-3.5 w-3.5" />Retry stream</button>
         </div>
       )}
     </div>

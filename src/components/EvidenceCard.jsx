@@ -1,1 +1,5 @@
-// TODO: Implement the evidence snapshot card.
+import { ExternalLink, ImageOff } from 'lucide-react';
+
+export default function EvidenceCard({ evidence }) {
+	return <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg"><div className="relative aspect-video bg-slate-100">{evidence.snapshot_url ? <img src={evidence.snapshot_url} alt={`${evidence.event_type || 'Detection'} evidence`} className="h-full w-full object-cover" loading="lazy" /> : <div className="flex h-full items-center justify-center text-slate-400"><ImageOff className="h-8 w-8" /></div>}<span className="absolute left-3 top-3 rounded-full bg-slate-950/75 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">{evidence.event_type || 'Detection'}</span></div><div className="flex items-center justify-between p-4"><div><p className="font-semibold text-slate-900">Camera {evidence.camera_id || 'N/A'}</p><p className="mt-1 text-xs text-slate-500">Track {evidence.track_id || 'N/A'}</p></div>{evidence.snapshot_url && <a href={evidence.snapshot_url} target="_blank" rel="noreferrer" title="Open evidence" className="rounded-lg p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-700"><ExternalLink className="h-4 w-4" /></a>}</div></article>;
+}

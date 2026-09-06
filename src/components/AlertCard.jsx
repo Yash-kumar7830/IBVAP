@@ -1,1 +1,7 @@
-// TODO: Implement the alert item display.
+import { AlertTriangle, ArrowUpRight, Check, Clock3, MapPin } from 'lucide-react';
+import RiskBadge from './RiskBadge';
+
+export default function AlertCard({ alert, onAcknowledge }) {
+	const risk = alert.risk_level || alert.risk || 'unknown';
+	return <article className="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg"><div className="flex items-start gap-3"><div className="rounded-xl bg-rose-50 p-2.5 text-rose-600"><AlertTriangle className="h-5 w-5" /></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="truncate font-semibold text-slate-900">{alert.type || 'Security alert'}</h3><RiskBadge level={risk} /></div><div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500"><span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{alert.camera_name || 'Unknown camera'}</span><span className="inline-flex items-center gap-1"><Clock3 className="h-3.5 w-3.5" />{alert.timestamp ? new Date(alert.timestamp).toLocaleString() : 'Just now'}</span><span>Track {alert.track_id || 'N/A'}</span></div></div><button type="button" title="Open alert" className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-50 hover:text-slate-700"><ArrowUpRight className="h-4 w-4" /></button></div>{onAcknowledge && <button type="button" onClick={() => onAcknowledge(alert)} className="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"><Check className="h-3.5 w-3.5" />Acknowledge</button>}</article>;
+}

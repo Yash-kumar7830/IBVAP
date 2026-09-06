@@ -1,4 +1,3 @@
-// TODO: Implement the dual video display.
 // src/components/VideoPanel.jsx
 import { useState } from 'react';
 import VideoPlayer from './VideoPlayer';
@@ -21,6 +20,7 @@ export default function VideoPanel({ camera, showOriginal = true, showAI = true,
         </div>
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={() => setViewMode('original')}
             className={`px-3 py-1 rounded text-sm ${
               viewMode === 'original' ? 'bg-blue-600 text-white' : 'border'
@@ -29,6 +29,7 @@ export default function VideoPanel({ camera, showOriginal = true, showAI = true,
             Original
           </button>
           <button
+            type="button"
             onClick={() => setViewMode('ai')}
             className={`px-3 py-1 rounded text-sm ${
               viewMode === 'ai' ? 'bg-blue-600 text-white' : 'border'
@@ -37,6 +38,7 @@ export default function VideoPanel({ camera, showOriginal = true, showAI = true,
             AI Annotated
           </button>
           <button
+            type="button"
             onClick={() => setViewMode('both')}
             className={`px-3 py-1 rounded text-sm ${
               viewMode === 'both' ? 'bg-blue-600 text-white' : 'border'

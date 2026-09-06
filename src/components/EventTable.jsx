@@ -1,1 +1,11 @@
-// TODO: Implement the sortable event logs table.
+import { useState } from 'react';
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react';
+import RiskBadge from './RiskBadge';
+
+export default function EventTable({ events = [] }) {
+	const [sort, setSort] = useState({ key: 'timestamp', direction: 'desc' });
+	const sorted = [...events].sort((a, b) => { const left = a[sort.key] || ''; const right = b[sort.key] || ''; return String(left).localeCompare(String(right), undefined, { numeric: true }) * (sort.direction === 'asc' ? 1 : -1); });
+	const toggle = (key) => setSort((current) => ({ key, direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc' }));
+	const heading = (label, key) => <button type="button" onClick={() => toggle(key)} className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">{label}{sort.key === key ? sort.direction === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" /> : <ChevronsUpDown className="h-3 w-3" />}</button>;
+	return <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[680px] text-left"><thead className="border-b border-slate-200 bg-slate-50"><tr><th className="p-4">{heading('Time', 'timestamp')}</th><th className="p-4">{heading('Camera', 'camera_name')}</th><th className="p-4">{heading('Event', 'type')}</th><th className="p-4">{heading('Object', 'object_type')}</th><th className="p-4">{heading('Risk', 'risk')}</th></tr></thead><tbody className="divide-y divide-slate-100">{sorted.map((event) => <tr key={event.id} className="transition hover:bg-slate-50"><td className="p-4 text-xs text-slate-500">{event.timestamp ? new Date(event.timestamp).toLocaleString() : '-'}</td><td className="p-4 text-sm font-semibold text-slate-800">{event.camera_name || '-'}</td><td className="p-4 text-sm text-slate-700">{event.type || '-'}</td><td className="p-4 text-sm text-slate-500">{event.object_type || '-'} <span className="text-xs">#{event.track_id || '-'}</span></td><td className="p-4"><RiskBadge level={event.risk} /></td></tr>)}</tbody></table></div>{!events.length && <div className="p-10 text-center text-sm text-slate-500">No events match the current filters.</div>}</div>;
+}
